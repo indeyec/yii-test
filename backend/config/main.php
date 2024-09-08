@@ -37,14 +37,30 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        /*
+       
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'apple/index' => 'apple/index',
+                'apple/create' => 'apple/create',
+                'apple/update/<id:\d+>' => 'apple/update',
+                'apple/view/<id:\d+>' => 'apple/view',
+                'apple/delete/<id:\d+>' => 'apple/delete',
             ],
         ],
-        */
+        
+        'as beforeRequest' => [
+            'class' => 'yii\filters\auth\HttpBasicAuth',
+            'auth' => function ($username, $password) {
+                // Здесь указываем пароль, с которым пользователи смогут входить
+                if ($username === 'admin' && $password === '123') {
+                     return new \common\models\User(['id' => 1]); // Можете изменить под своего пользователя
+                }
+        return null;
+    },
+],
+        
     ],
     'params' => $params,
 ];
