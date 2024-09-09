@@ -24,6 +24,7 @@ class Apple extends ActiveRecord
     public const STATUS_FALLEN = 'fallen';
     public const STATUS_ROTTEN = 'rotten';
     public const STATUS_EATEN = 'eaten';
+    public const STATUS_PENDING = 'pending';
 
     // Время портиться после падения (5 часов в секундах)
     private const ROTTEN_TIME = 5 * 3600;
@@ -48,7 +49,7 @@ class Apple extends ActiveRecord
             [['created_at', 'fallen_at'], 'integer'],
             [['size'], 'number'],
             [['color', 'status'], 'string', 'max' => 50],
-            [['status'], 'in', 'range' => [self::STATUS_ON_TREE, self::STATUS_FALLEN, self::STATUS_ROTTEN, self::STATUS_EATEN]],
+            [['status'], 'in', 'range' => [self::STATUS_ON_TREE, self::STATUS_FALLEN, self::STATUS_ROTTEN, self::STATUS_EATEN, self::STATUS_PENDING]],
             [['eaten_percent'], 'number', 'min' => 0, 'max' => 100],
         ];
     }

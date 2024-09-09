@@ -1,0 +1,19 @@
+{
+  "name": "yii-test",
+  "homepage": "https://github.com/indeyec/yii-test",
+  "authors": [
+    "Vladislav Shilov <vlad.shilov03@mail.ru>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "vendor/bower-asset",
+    "test",
+    "tests"
+  ]
+}
