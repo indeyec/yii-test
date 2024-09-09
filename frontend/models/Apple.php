@@ -1,100 +1,54 @@
 <?php
 
-namespace common\models;
+namespace app\models;
 
-use yii\db\ActiveRecord;
 use Yii;
 
-class Apple extends ActiveRecord
+/**
+ * This is the model class for table "apple".
+ *
+ * @property int $id
+ * @property string $color
+ * @property int $created_at
+ * @property int|null $fallen_at
+ * @property string $status
+ * @property float $size
+ */
+class Apple extends \yii\db\ActiveRecord
 {
-    const STATUS_ON_TREE = 'on_tree';
-    const STATUS_FALLEN = 'fallen';
-    const STATUS_ROTTEN = 'rotten';
-
-    public $color; // цвет яблока
-    public $created_at; // дата появления
-    public $fallen_at; // дата падения
-    public $status; // статус яблока
-    public $size; // размер яблока, 1 = целое яблоко
-
     /**
-     * Инициализация нового яблока с случайным цветом и временем появления.
+     * {@inheritdoc}
      */
-    public function __construct($color = null)
+    public static function tableName()
     {
-        parent::__construct();
-        
-        // Случайный цвет, если не указан
-        $this->color = $color ?? $this->getRandomColor();
-        $this->created_at = time();
-        $this->status = self::STATUS_ON_TREE;
-        $this->size = 1.0;
+        return 'apple';
     }
 
     /**
-     * Случайный выбор цвета яблока.
+     * {@inheritdoc}
      */
-    private function getRandomColor()
+    public function rules()
     {
-        $colors = ['green', 'red', 'yellow'];
-        return $colors[array_rand($colors)];
+        return [
+            [['color', 'created_at'], 'required'],
+            [['created_at', 'fallen_at'], 'integer'],
+            [['size'], 'number'],
+            [['color', 'status'], 'string', 'max' => 50],
+        ];
     }
 
     /**
-     * Яблоко падает с дерева.
+     * {@inheritdoc}
      */
-    public function fallToGround()
+    public function attributeLabels()
     {
-        if ($this->status === self::STATUS_ON_TREE) {
-            $this->status = self::STATUS_FALLEN;
-            $this->fallen_at = time();
-        }
-    }
-
-    /**
-     * Откусить часть яблока.
-     * 
-     * @param float $percent процент откушенного яблока (от 0 до 100)
-     * @throws \Exception если яблоко нельзя съесть
-     */
-    public function eat($percent)
-    {
-        if ($this->status === self::STATUS_ON_TREE) {
-            throw new \Exception('Нельзя съесть яблоко, пока оно на дереве.');
-        }
-
-        if ($this->isRotten()) {
-            throw new \Exception('Нельзя съесть испорченное яблоко.');
-        }
-
-        $biteSize = $percent / 100;
-        $this->size -= $biteSize;
-
-        if ($this->size <= 0) {
-            $this->delete();
-        }
-    }
-
-    /**
-     * Проверка, испортилось ли яблоко.
-     */
-    public function isRotten()
-    {
-        if ($this->status === self::STATUS_FALLEN && (time() - $this->fallen_at) > (5 * 3600)) {
-            $this->status = self::STATUS_ROTTEN;
-        }
-
-        return $this->status === self::STATUS_ROTTEN;
-    }
-
-    /**
-     * Удаление яблока из базы данных.
-     */
-    public function delete()
-    {
-        // Если яблоко полностью съедено
-        if ($this->size <= 0) {
-            parent::delete();
-        }
+        return [
+            'id' => 'ID',
+            'color' => 'Color',
+            'created_at' => 'Created At',
+            'fallen_at' => 'Fallen At',
+            'status' => 'Status',
+            'size' => 'Size',
+        ];
     }
 }
