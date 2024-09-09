@@ -1,15 +1,11 @@
 <?php
-
-use app\models\Apple;
 use yii\helpers\Html;
-use yii\helpers\Url;
-use yii\grid\ActionColumn;
 use yii\grid\GridView;
 
-/** @var yii\web\View $this */
-/** @var yii\data\ActiveDataProvider $dataProvider */
+/* @var $this yii\web\View */
+/* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Apples';
+$this->title = 'Apple List';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="apple-index">
@@ -20,7 +16,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Create Apple', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
-
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [
@@ -28,18 +23,13 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'id',
             'color',
-            'created_at',
-            'fallen_at',
+            'created_at:datetime',
+            'fallen_at:datetime',
             'status',
-            //'size',
-            [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Apple $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
-            ],
+            'size',
+
+            ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
-
 
 </div>

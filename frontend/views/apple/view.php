@@ -1,15 +1,13 @@
 <?php
-
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
-/** @var yii\web\View $this */
-/** @var app\models\Apple $model */
+/* @var $this yii\web\View */
+/* @var $model app\models\Apple */
 
 $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Apples', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
-\yii\web\YiiAsset::register($this);
 ?>
 <div class="apple-view">
 
@@ -24,6 +22,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
+        <?= Html::a('Fall', ['fall', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
+        <?= Html::a('Eat', ['eat', 'id' => $model->id], ['class' => 'btn btn-info']) ?>
     </p>
 
     <?= DetailView::widget([
@@ -31,11 +31,21 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'id',
             'color',
-            'created_at',
-            'fallen_at',
+            'created_at:datetime',
+            'fallen_at:datetime',
             'status',
             'size',
         ],
     ]) ?>
+
+    <?php if ($model->status === \app\models\Apple::STATUS_FALLEN): ?>
+        <div class="form-group">
+            <?= Html::beginForm(['eat', 'id' => $model->id], 'post') ?>
+            <?= Html::label('Eat Percentage') ?>
+            <?= Html::input('number', 'percent', 0, ['min' => 0, 'max' => 100, 'step' => 0.1]) ?>
+            <?= Html::submitButton('Eat', ['class' => 'btn btn-info']) ?>
+            <?= Html::endForm() ?>
+        </div>
+    <?php endif; ?>
 
 </div>

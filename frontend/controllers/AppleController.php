@@ -1,12 +1,15 @@
 <?php
 
-namespace app\controllers;
+namespace frontend\controllers;
 
 use app\models\Apple;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
+use Yii;
+use yii\web\BadRequestHttpException;
 
 /**
  * AppleController implements the CRUD actions for Apple model.
@@ -14,17 +17,19 @@ use yii\filters\VerbFilter;
 class AppleController extends Controller
 {
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return array_merge(
             parent::behaviors(),
             [
                 'verbs' => [
-                    'class' => VerbFilter::className(),
+                    'class' => VerbFilter::class,
                     'actions' => [
                         'delete' => ['POST'],
+                        'fall' => ['POST'],
+                        'eat' => ['POST'],
                     ],
                 ],
             ]
@@ -36,20 +41,18 @@ class AppleController extends Controller
      *
      * @return string
      */
-    public function actionIndex()
+    public function actionIndex(): string
     {
         $dataProvider = new ActiveDataProvider([
             'query' => Apple::find(),
-            /*
             'pagination' => [
-                'pageSize' => 50
+                'pageSize' => 50,
             ],
             'sort' => [
                 'defaultOrder' => [
                     'id' => SORT_DESC,
-                ]
+                ],
             ],
-            */
         ]);
 
         return $this->render('index', [
@@ -63,28 +66,25 @@ class AppleController extends Controller
      * @return string
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
+    public function actionView(int $id): string
     {
+        $model = $this->findModel($id);
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
         ]);
     }
 
     /**
      * Creates a new Apple model.
      * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
+     * @return string|Response
      */
     public function actionCreate()
     {
         $model = new Apple();
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        } else {
-            $model->loadDefaultValues();
+        if ($model->load(Yii::$app->request->post()) && $model->validate() && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('create', [
@@ -96,14 +96,14 @@ class AppleController extends Controller
      * Updates an existing Apple model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id ID
-     * @return string|\yii\web\Response
+     * @return string|Response
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
+    public function actionUpdate(int $id)
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post()) && $model->validate() && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -116,14 +116,57 @@ class AppleController extends Controller
      * Deletes an existing Apple model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param int $id ID
-     * @return \yii\web\Response
+     * @return Response
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    public function actionDelete(int $id): Response
     {
         $this->findModel($id)->delete();
-
         return $this->redirect(['index']);
+    }
+
+    /**
+     * Makes the apple fall to the ground.
+     * @param int $id ID
+     * @return Response
+     * @throws NotFoundHttpException
+     * @throws BadRequestHttpException
+     */
+    public function actionFall(int $id): Response
+    {
+        $model = $this->findModel($id);
+
+        if ($model->status === Apple::STATUS_EATEN) {
+            throw new BadRequestHttpException('Cannot fall, the apple is already eaten.');
+        }
+
+        $model->fallToGround();
+
+        return $this->redirect(['view', 'id' => $model->id]);
+    }
+
+    /**
+     * Eats a portion of the apple.
+     * @param int $id ID
+     * @param float $percent Percentage to eat
+     * @return Response
+     * @throws NotFoundHttpException
+     * @throws BadRequestHttpException
+     */
+    public function actionEat(int $id, float $percent): Response
+    {
+        $model = $this->findModel($id);
+
+        if (!$model->canEat()) {
+            throw new BadRequestHttpException('Cannot eat the apple in its current state.');
+        }
+
+        $model->eat($percent);
+
+        // Обновить статус и удалить яблоко, если оно съедено
+        $model->updateStatusAndDeleteIfEaten();
+
+        return $this->redirect(['view', 'id' => $model->id]);
     }
 
     /**
@@ -133,9 +176,9 @@ class AppleController extends Controller
      * @return Apple the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel(int $id): Apple
     {
-        if (($model = Apple::findOne(['id' => $id])) !== null) {
+        if (($model = Apple::findOne($id)) !== null) {
             return $model;
         }
 
