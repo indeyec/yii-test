@@ -153,9 +153,22 @@ class AppleController extends Controller
      * @throws NotFoundHttpException
      * @throws BadRequestHttpException
      */
-    public function actionEat(int $id, float $percent): Response
+    public function actionEat(int $id): Response
     {
         $model = $this->findModel($id);
+
+        Yii::info($model->testMethod(), __METHOD__);
+
+        $percent = Yii::$app->request->post('percent');
+
+        if ($percent === null) {
+            throw new BadRequestHttpException('Missing required parameter: percent');
+        }
+
+        $percent = (float) $percent;
+
+        Yii::info("Apple status: " . $model->status, __METHOD__);
+        Yii::info("Is apple rotten: " . ($model->isRotten() ? "Yes" : "No"), __METHOD__);
 
         if (!$model->canEat()) {
             throw new BadRequestHttpException('Cannot eat the apple in its current state.');
@@ -167,6 +180,30 @@ class AppleController extends Controller
         $model->updateStatusAndDeleteIfEaten();
 
         return $this->redirect(['view', 'id' => $model->id]);
+    }
+
+    /**
+     * Renders the form for making the apple fall to the ground.
+     * @param int $id ID
+     * @return string
+     * @throws NotFoundHttpException
+     */
+    public function actionFallForm(int $id): string
+    {
+        $model = $this->findModel($id);
+        return $this->render('fall', ['model' => $model]);
+    }
+
+    /**
+     * Renders the form for eating a portion of the apple.
+     * @param int $id ID
+     * @return string
+     * @throws NotFoundHttpException
+     */
+    public function actionEatForm(int $id): string
+    {
+        $model = $this->findModel($id);
+        return $this->render('eat', ['model' => $model]);
     }
 
     /**

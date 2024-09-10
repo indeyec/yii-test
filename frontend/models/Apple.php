@@ -100,7 +100,7 @@ class Apple extends ActiveRecord
      *
      * @return bool
      */
-    private function canEat(): bool
+    public function canEat(): bool
     {
         return $this->status === self::STATUS_FALLEN && !$this->isRotten();
     }
@@ -156,7 +156,7 @@ class Apple extends ActiveRecord
      *
      * @return bool
      */
-    private function isRotten(): bool
+    public function isRotten(): bool
     {
         if ($this->status === self::STATUS_ROTTEN) {
             return true;
@@ -186,4 +186,8 @@ class Apple extends ActiveRecord
             }
         }
     }
+    public function testMethod(): string
+{
+    return 'Method is called';
+}
 }

@@ -22,8 +22,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 'method' => 'post',
             ],
         ]) ?>
-        <?= Html::a('Fall', ['fall', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
-        <?= Html::a('Eat', ['eat', 'id' => $model->id], ['class' => 'btn btn-info']) ?>
+        <?php if ($model->status !== \app\models\Apple::STATUS_FALLEN && $model->status !== \app\models\Apple::STATUS_EATEN): ?>
+            <?= Html::a('Make Fall', ['fall', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
+        <?php endif; ?>
+        <?php if ($model->status === \app\models\Apple::STATUS_FALLEN): ?>
+            <?= Html::a('Eat Apple', ['eat-form', 'id' => $model->id], ['class' => 'btn btn-info']) ?>
+        <?php endif; ?>
     </p>
 
     <?= DetailView::widget([
