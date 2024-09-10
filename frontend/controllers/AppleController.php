@@ -205,7 +205,7 @@ class AppleController extends Controller
         $model = $this->findModel($id);
         return $this->render('eat', ['model' => $model]);
     }
-
+   
     /**
      * Finds the Apple model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

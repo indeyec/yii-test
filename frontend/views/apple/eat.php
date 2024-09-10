@@ -16,11 +16,21 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <div class="apple-form">
         <?php $form = ActiveForm::begin([
-            'action' => ['apple/eat', 'id' => $model->id],
+            'action' => ['apple/eat', 'id' => $model->id], // Action направлен на метод eat контроллера
             'method' => 'post',
         ]); ?>
 
-        <?= $form->field($model, 'eaten_percent')->textInput(['type' => 'number', 'min' => 0, 'max' => 100]) ?>
+        <!-- Поле для ввода процента, сколько съесть -->
+        <div class="form-group">
+            <?= Html::label('Percent to eat', 'percent') ?>
+            <?= Html::input('number', 'percent', null, [
+                'class' => 'form-control',
+                'min' => 0,
+                'max' => 100,
+                'step' => 0.1, // Позволяет вводить дробные значения
+                'required' => true, // Поле обязательно для заполнения
+            ]) ?>
+        </div>
 
         <div class="form-group">
             <?= Html::submitButton('Eat', ['class' => 'btn btn-success']) ?>
