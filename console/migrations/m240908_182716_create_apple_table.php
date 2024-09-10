@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%apple}}`.
  */
-class m240908_18_create_apple_table extends \yii\db\Migration
+class m240908_182716_create_apple_table extends \yii\db\Migration
 {
     /**
      * {@inheritdoc}
